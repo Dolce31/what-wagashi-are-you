@@ -62,7 +62,7 @@ const storyScenes = {
   },
 
   scene_2: {
-    image: "https://i.postimg.cc/Jzzz0W9D/Scene-2.png",
+    image: "https://i.postimg.cc/Gm8RfPVB/IMG-5717.png",
     text: {
       th: "...",
       ja: "..."
