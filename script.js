@@ -289,10 +289,12 @@ if (musicBtn && bgm) {
     if (bgm.paused) {
       bgm.play().then(() => {
         musicBtn.classList.add("playing");
+        musicBtn.innerText = "♫"; // กำลังเล่นเพลง แสดงโน้ตดนตรี
       }).catch(err => console.log("Audio play blocked:", err));
     } else {
       bgm.pause();
       musicBtn.classList.remove("playing");
+      musicBtn.innerText = "✕"; 
     }
   };
 }
