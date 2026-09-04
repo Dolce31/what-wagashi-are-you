@@ -70,7 +70,7 @@ const storyScenes = {
     choices: [
       { 
         text: { th: "ถัดไป ➜", ja: "次へ ➜" }, 
-        nextScene: "scene_3", // แก้ไข: ชี้ไปยัง scene_3 แทนการวนซ้ำ
+        nextScene: "scene_3",
         type: null,
         points: 0 
       }
@@ -81,7 +81,7 @@ const storyScenes = {
     image: "https://i.postimg.cc/TYzqrCJp/Scene-3.png",
     text: {
       th: "เมื่อลืมตาขึ้นมา คุณพบว่าไม่ได้อยู่ในห้องของตัวเองอีกต่อไป คุณกำลังยืนอยู่กลางทุ่งหญ้าและป่าไม้ ในสถานที่ที่ไม่เคยเห็นมาก่อน",
-      ja: "目を覚ますと、そこはもう自分の部屋ではありませんでした。目の前に広がる草原と森——あなたは、見覚えのない見知らぬ場所に立っていました。" // แก้ไข: เติม 目
+      ja: "目を覚ますと、そこはもう自分の部屋ではありませんでした。目の前に広がる草原と森——あなたは、見覚えのない見知らぬ場所に立っていました。"
     },
     choices: [
       { 
@@ -89,13 +89,13 @@ const storyScenes = {
         nextScene: "scene_result",
         type: "typeA",
         points: 1 
-      }, // แก้ไข: เติม comma คั่น choice
+      },
       { 
         text: { th: "ตื่นเต้นเหมือนได้อิเซไกมาต่างโลก", ja: "まるで異世界転生！？ワクワクする" }, 
         nextScene: "scene_result",
         type: "typeB",
         points: 1
-      }, // แก้ไข: เติม comma คั่น choice
+      },
       { 
         text: { th: "สับสน มึนงง แต่ก็อยากลองสำรวจที่แห่งนี้", ja: "混乱しているけど、少し探検してみたい" }, 
         nextScene: "scene_result",
@@ -115,7 +115,6 @@ function startGame() {
   storyScreen.classList.remove("hidden");
   triggerFade(storyScreen);
 
-  // แก้ไข: รีเซ็ตแต้มให้ครบทั้ง 3 สาย
   scores = { typeA: 0, typeB: 0, typeC: 0 };
   currentStep = 1;
   currentSceneId = "scene_intro";
@@ -148,9 +147,11 @@ function renderScene(sceneId) {
 
   const imgEl = document.getElementById("scene-img");
   if (scene.image) {
+    imgEl.src = "";
     imgEl.src = scene.image;
     imgEl.style.display = "block";
   } else {
+    imgEl.src = "";
     imgEl.style.display = "none";
   }
 
@@ -280,26 +281,43 @@ function triggerFade(element) {
   element.classList.add("fade-in");
 }
 
-// 8. BGM
+// 8. BGM (เล่นทันทีเมื่อสัมผัสหน้าจอครั้งแรก + สลับปุ่มเปิด/ปิด)
 const bgm = document.getElementById("bgm");
 const musicBtn = document.getElementById("music-toggle-btn");
 
+function startMusic() {
+  if (bgm && bgm.paused) {
+    bgm.play().then(() => {
+      if (musicBtn) {
+        musicBtn.classList.add("playing");
+        musicBtn.innerText = "♫";
+      }
+    }).catch(err => console.log("Audio play blocked:", err));
+  }
+}
+
+// แตะหรือคลิกที่หน้าจอครั้งแรกเพื่อเริ่มเพลง
+document.addEventListener("click", startMusic, { once: true });
+document.addEventListener("touchstart", startMusic, { once: true });
+
+// ปุ่มเปิด/ปิดเสียงมุมขวาบน
 if (musicBtn && bgm) {
-  musicBtn.onclick = () => {
+  musicBtn.onclick = (e) => {
+    e.stopPropagation(); // ไม่ให้กระทบตัวดักจับแตะจอ
     if (bgm.paused) {
       bgm.play().then(() => {
         musicBtn.classList.add("playing");
-        musicBtn.innerText = "♫"; // กำลังเล่นเพลง แสดงโน้ตดนตรี
+        musicBtn.innerText = "♫";
       }).catch(err => console.log("Audio play blocked:", err));
     } else {
       bgm.pause();
       musicBtn.classList.remove("playing");
-      musicBtn.innerText = "✕"; 
+      musicBtn.innerText = "✕";
     }
   };
 }
 
-// ผูกฟังก์ชันเข้ากับ Global Window ป้องกันปัญหา onclick ไม่ทำงาน
+// ผูกฟังก์ชันเข้ากับ Global Window
 window.startGame = startGame;
 window.restartGame = restartGame;
 window.changeLanguage = changeLanguage;
